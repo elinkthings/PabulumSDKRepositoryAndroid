@@ -4,6 +4,8 @@
 
 [aar package download link](https://github.com/elinkthings/PabulumSDKRepositoryAndroid/releases)
 
+[key registration](http://sdk.aicare.net.cn)
+
 [中文文档](README_CN.md)
 
 This document is to guide Android developers to integrate Pabulum-SDK-Android in Android 4.4 and above systems, mainly for some key use examples
@@ -78,7 +80,7 @@ You can also use the aar package dependency, please download it yourself and put
 ```
 
 
-> Initialization, [key registration](http://sdk.aicare.net.cn/register)
+> Initialization, [key registration](http://sdk.aicare.net.cn)
 ```
 // It is recommended to initialize in Application
 PabulumSDK.getInstance (). Init (this, "key", "secret");

@@ -5,6 +5,8 @@
 
 [aar包下载地址](https://github.com/elinkthings/PabulumSDKRepositoryAndroid/releases)
 
+[key注册](http://sdk.aicare.net.cn)
+
 [English documentation](README.md)
 
 该文档为指导Android开发人员在Android 4.4及以上系统中集成好营养-SDK-Android，主要为一些关键的使用示例
@@ -79,7 +81,7 @@ repositories {
 ```
 
 
-> 初始化,[key注册](http://sdk.aicare.net.cn/register)
+> 初始化,[key注册](http://sdk.aicare.net.cn)
 ```
 //建议在Application中初始化
 PabulumSDK.getInstance().init(this,"key","secret");
