@@ -5,13 +5,17 @@
 
 [aar包下载地址](https://github.com/elinkthings/PabulumSDKRepositoryAndroid/releases)
 
-[key注册](http://sdk.aicare.net.cn)
-
 [English documentation](README.md)
 
-该文档为指导Android开发人员在Android 4.4及以上系统中集成好营养-SDK-Android，主要为一些关键的使用示例
 
-## 一、导入SDK
+
+## 使用条件
+1,最低版本 android4.4（API 19）
+2,设备所使用的蓝牙版本需要4.0及以上
+3,依赖环境androidx
+
+
+## 导入SDK
 
 
 ```
@@ -33,20 +37,15 @@ repositories {
 
 步骤2.添加依赖项
 	dependencies {
-	        implementation 'com.github.elinkthings:PabulumSDKRepositoryAndroid:1.2.6'
+	        implementation 'com.github.inet2018:PabulumSDKRepositoryAndroid:1.2.6'
 	}
-
-
-
-
 
 也可以使用aar包依赖,请自行下载放到项目的libs中
 
 
-
 ```
 
-## 二、权限设置
+## 权限设置
 
 ```
 <!--In most cases, you need to ensure that the device supports BLE.-->
@@ -67,9 +66,17 @@ repositories {
 
 >  6.0及以上系统必须要定位权限，且需要手动获取权限
 
-## 三、开始集成
+## 开始接入
 
-> 在AndroidManifest.xml application标签下面增加
+- 首先给SDK配置key和secret，[申请地址](http://sdk.aicare.net.cn)
+```
+ //在主项目的application中调用
+PabulumSDK.getInstance().init(this,"key","secret");
+```
+
+
+
+- 在AndroidManifest.xml application标签下面增加
 ```
 <application>
     ...
@@ -81,13 +88,7 @@ repositories {
 ```
 
 
-> 初始化,[key注册](http://sdk.aicare.net.cn)
-```
-//建议在Application中初始化
-PabulumSDK.getInstance().init(this,"key","secret");
-```
-
-你可以直接让你自己的`Activity`类继承`BleProfileServiceReadyActivity`
+- 你可以直接让你自己的`Activity`类继承`BleProfileServiceReadyActivity`
 
 ```
 public class MyActivity extends BleProfileServiceReadyActivity
@@ -110,7 +111,7 @@ public class MyActivity extends BleProfileServiceReadyActivity
 
 ```
 
-## 四、扫描设备，停止扫描设备,查看扫描状态
+## 扫描设备，停止扫描设备,查看扫描状态
 与扫描相关的API如下，详情参考BleProfileServiceReadyActivity类，具体使用参考demo
 
 ```
@@ -131,7 +132,7 @@ public class MyActivity extends BleProfileServiceReadyActivity
 
 
 
-## 五、连接设备，断开设备
+## 连接设备，断开设备
 
 与连接相关的API如下，详情参考BleProfileServiceReadyActivity类，具体使用参考demo。
 
@@ -154,7 +155,7 @@ connectDevice(BluetoothDevice device)
 
 使用`connectDevice`方法连接，，使用`onStateChanged`方法监听连接的状态，使用`onError`方法监听连接过程中的异常，以便于进行额外的处理和问题排查。使用`isConnected`方法判断连接是否已经建立。
 
-## 六 连接成功，接受秤返回的数据
+## 连接成功，接受秤返回的数据
 以下方法或接口可直接在继承BleProfileServiceReadyActivity类后自动获得
 
 ```
@@ -247,7 +248,7 @@ connectDevice(BluetoothDevice device)
 
 ```
 > 注意：这些接口或方法部分需要APP给体脂下发命令才会有返回数据.
-## 七 给设备下发指令
+##  APP给设备下发指令
 在BleProfileServiceReadyActivity.onServiceBinded(PabulumService.PabulumBinder binder)获得PabulumService.PabulumBinder的实例，调用binder里面方法
 
 
@@ -279,14 +280,65 @@ connectDevice(BluetoothDevice device)
 ```
 
 
-## 八 类说明
+## 类说明
 
 
-#### 1.FoodData(重量数据)
-```
-类型	参数名	说明
-String data;//重量，对应当前单位
-byte unit;//单位
-byte deviceType;//设备类型：0x04(无小数点), 0x05(大量程)
-double weight;//重量，对应单位g
-```
+#### FoodData(重量数据)
+| 类型|	参数名|	说明
+| ---|---|---
+| String | data; | 重量，对应当前单位
+| byte | unit; | 单位
+| byte | deviceType; | 设备类型：0x04(无小数点), 0x05(大量程)
+| double | weight; | 重量，对应单位g
+
+## 版本历史
+|版本号|更新时间|作者|更新信息|
+|:----|:---|:-----|-----|
+| 1.0 	| 2016/04/15 | Suzy 	| 初步版本
+| 1.0.1 | 2016/09/08 | Suzy 	| 兼容新协议
+| 1.0.2 | 2017/01/14 | Suzy 	| 增加透传接口
+| 1.0.3 | 2017/01/19 | Suzy 	| 增加设置重量接口
+| 1.0.4 | 2017/03/31 | Suzy 	| 调换设置重量高低字节
+| 1.0.7 | 2017/06/28 | Suzy 	| 增加关机指令接口
+| 1.0.8 | 2017/09/01 | Suzy 	| 增加设置（总）卡路里数据接口
+| 1.0.9 | 2017/09/20 | Suzy 	| 增加设置（总）脂肪数据等接口
+| 1.1.0 | 2018/05/12 | Suzy 	| 增加透传接口
+| 1.1.1 | 2018/08/15 | Suzy 	| So 库更新
+| 1.1.2 | 2018/12/03 | 陈福行 	| 增加获取 DID 指令
+| 1.1.3 | 2019/01/24 | 陈福行 	| 修复蓝牙数据错误导致闪退问题
+| 1.1.4 | 2019/03/07 | 陈福行 	| 增加千克/斤,增加动态权限提示
+| 1.1.5 | 2019/04/26 | 陈福行 	| 增加 get 方法获取类型,修复校验问题
+| 1.1.6 | 2019/04/29 | 陈福行 	| 增加咖啡秤同步时间
+| 1.1.7 | 2019/05/15 | 陈福行 	| 修复注销广播可能会出现异常的问题
+| 1.1.8 | 2019/05/22 | 陈福行 	| 增加倒计时功能
+| 1.1.9 | 2019/06/26 | 陈福行 	| 修改咖啡秤暂停指令,增加时间校验
+| 1.2.0 | 2019/07/16 | 陈福行 	| 修改咖啡功能操作指令
+| 1.2.1 | 2019/08/12 | 陈福行 	| 修改 jar 中的 bug
+| 1.2.2 | 2019/10/08 | 陈福行 	| 增加错误指令和单位
+| 1.2.3 | 2019/11/28 | 陈福行 	| 增加闹铃停止指令
+| 1.2.4 | 2020/03/03 | 陈福行 	| 增加透传数据接口
+
+## FAQ
+
+- 扫描不到蓝牙设备？
+1.查看App权限是否正常,6.0及以上系统必须要定位权限，且需要手动获取权限
+2.查看手机的定位服务是否开启,部分手机可能需要打开GPS
+3.拔掉电池重启秤
+4.是否被其他手机连接(秤未被连接时，秤盘上蓝牙图标会不断闪烁)
+5.PabulumService是否在AndroidManifest中注册
+
+- 协议支持哪些单位？
+1.单位最多只支持8种，具体支持什么单位请通过getUnits()方法获取,如无法获取,请参照秤的出厂设置。
+
+
+
+
+
+## 联系我们
+深圳市易连物联网有限公司
+
+电话：0755-81773367
+
+官网：www.elinkthings.com
+
+邮箱：app@elinkthings.com

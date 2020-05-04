@@ -8,9 +8,12 @@
 
 [中文文档](README_CN.md)
 
-This document is to guide Android developers to integrate Pabulum-SDK-Android in Android 4.4 and above systems, mainly for some key use examples
+## Conditions of Use
+1, Minimum version android4.4 (API 19)
+2, The Bluetooth version used by the device requires 4.0 and above
+3, Depends on the environment androidx
 
-## 1. Import SDK
+##  Import SDK
 
 
 ```
@@ -45,7 +48,7 @@ You can also use the aar package dependency, please download it yourself and put
 
 ```
 
-## 2, permission settings
+##   permission settings
 
 ```
 <!-In most cases, you need to ensure that the device supports BLE .-->
@@ -66,9 +69,14 @@ You can also use the aar package dependency, please download it yourself and put
 
 > 6.0 and above systems must locate permissions and need to manually obtain permissions
 
-## 3, start integration
+##   Start access
+- First configure the key and secret for the SDK, [application address](http://sdk.aicare.net.cn)
+```
+  // Called in the application of the main project
+PabulumSDK.getInstance (). Init (this, "key", "secret");
+```
 
-> Add under AndroidManifest.xml application tag
+- Add under AndroidManifest.xml application tag
 ```
 <application>
     ...
@@ -79,14 +87,7 @@ You can also use the aar package dependency, please download it yourself and put
 
 ```
 
-
-> Initialization, [key registration](http://sdk.aicare.net.cn)
-```
-// It is recommended to initialize in Application
-PabulumSDK.getInstance (). Init (this, "key", "secret");
-```
-
-You can directly make your own Activity class inherit BleProfileServiceReadyActivity
+- You can directly make your own Activity class inherit BleProfileServiceReadyActivity
 
 ```
 public class MyActivity extends BleProfileServiceReadyActivity
@@ -109,7 +110,7 @@ public class MyActivity extends BleProfileServiceReadyActivity
 
 ```
 
-## 4, scan the device, stop scanning the device, check the scan status
+##  scan the device, stop scanning the device, check the scan status
 The APIs related to scanning are as follows. For details, refer to the BleProfileServiceReadyActivity class. For specific use, refer to the demo
 
 ```
@@ -130,7 +131,7 @@ The APIs related to scanning are as follows. For details, refer to the BleProfil
 
 
 
-## 5, connect the device, disconnect the device
+##   connect the device, disconnect the device
 
 The connection-related APIs are as follows. For details, refer to the BleProfileServiceReadyActivity class. For specific usage, refer to the demo.
 
@@ -153,7 +154,7 @@ connectDevice (BluetoothDevice device)
 
 Use the `connectDevice` method to connect, use the` onStateChanged` method to monitor the status of the connection, and use the `onError` method to monitor exceptions during the connection process for additional processing and troubleshooting. Use the `isConnected` method to determine whether the connection has been established.
 
-## 6 Connect successfully, accept the data returned by the scale
+##   Connect successfully, accept the data returned by the scale
 The following methods or interfaces can be automatically obtained directly after inheriting the BleProfileServiceReadyActivity class
 
 ```
@@ -247,7 +248,7 @@ The following methods or interfaces can be automatically obtained directly after
 
 ```
 > Note: Some of these interfaces or methods require APP to issue commands to body fat to return data.
-## 7 Give instructions to the device
+##   Give instructions to the device
 Get an instance of PabulumService.PabulumBinder in BleProfileServiceReadyActivity.onServiceBinded (PabulumService.PabulumBinder binder), call the method inside binder
 
 
@@ -279,10 +280,8 @@ Stop alarm command: stopAlarm ();
 ```
 
 
-## 8 categories
-
-
-#### 1.FoodData (weight data)
+##   categories
+####  FoodData (weight data)
 ```
 Type Parameter name Description
 String data; // Weight, corresponding to the current unit
@@ -290,3 +289,60 @@ byte unit; // unit
 byte deviceType; // Device type: 0x04 (no decimal point), 0x05 (large range)
 double weight; // Weight, corresponding unit g
 ```
+
+
+## Version History
+| Version number | Update time | Author | Update information |
+|:----|:---|:-----|-----|
+| 1.0 	| 2016/04/15 | Suzy 	| Preliminary version
+| 1.0.1 | 2016/09/08 | Suzy 	| Compatible with new protocols
+| 1.0.2 | 2017/01/14 | Suzy 	| Add transparent transmission interface
+| 1.0.3 | 2017/01/19 | Suzy 	| Increase setting weight interface
+| 1.0.4 | 2017/03/31 | Suzy 	| Swap setting weight high and low bytes
+| 1.0.7 | 2017/06/28 | Suzy 	| Add shutdown command interface
+| 1.0.8 | 2017/09/01 | Suzy 	| Increase the setting (total) calorie data interface
+| 1.0.9 | 2017/09/20 | Suzy 	| Increase the interface for setting (total) fat data
+| 1.1.0 | 2018/05/12 | Suzy 	| Add transparent transmission interface
+| 1.1.1 | 2018/08/15 | Suzy 	| So library update
+| 1.1.2 | 2018/12/03 | Xing 	| Add Get DID command
+| 1.1.3 | 2019/01/24 | Xing 	| Fix flashback issue caused by Bluetooth data error
+| 1.1.4 | 2019/03/07 | Xing 	| Increase kg / kg, increase dynamic permission prompt
+| 1.1.5 | 2019/04/26 | Xing 	| Add get method to get type, fix verification problem
+| 1.1.6 | 2019/04/29 | Xing 	| Increase coffee scale synchronization time
+| 1.1.7 | 2019/05/15 | Xing 	| Fixed an issue where logout broadcast may be abnormal
+| 1.1.8 | 2019/05/22 | Xing 	| Add countdown function
+| 1.1.9 | 2019/06/26 | Xing 	| Modify the coffee scale pause command to increase time verification
+| 1.2.0 | 2019/07/16 | Xing 	| Modify coffee function operation instructions
+| 1.2.1 | 2019/08/12 | Xing 	| Fix bugs in jar
+| 1.2.2 | 2019/10/08 | Xing 	| Add wrong commands and units
+| 1.2.3 | 2019/11/28 | Xing 	| Add alarm stop command
+| 1.2.4 | 2020/03/03 | Xing 	| Add transparent data interface
+
+
+
+
+## FAQ
+
+- Can't scan the Bluetooth device?
+1. Check whether the permissions of the App are normal. The 6.0 and above systems must locate the permissions and need to manually obtain the permissions
+2. Check whether the location service of the mobile phone is turned on, some mobile phones may need to turn on the GPS
+3. Unplug the battery and restart the scale
+4. Whether it is connected by other mobile phones (when the scale is not connected, the Bluetooth icon on the weighing pan will continue to flash)
+5. Is PabulumService registered in AndroidManifest
+
+- What units does the agreement support?
+1. Units can only support up to 8 types. For specific units, please obtain them by the getUnits () method. If they cannot be obtained, please refer to the factory settings of the scale.
+
+
+
+
+## Contact Us
+Shenzhen elink things Co., Ltd.
+
+Phone: 0755-81773367
+
+Official website: www.elinkthings.com
+
+Email: app@elinkthings.com
+
+
