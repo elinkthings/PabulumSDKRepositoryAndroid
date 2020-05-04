@@ -10,9 +10,11 @@
 
 
 ## 使用条件
-1,最低版本 android4.4（API 19）
-2,设备所使用的蓝牙版本需要4.0及以上
-3,依赖环境androidx
+1. 最低版本 android4.4（API 19）
+
+2. 设备所使用的蓝牙版本需要4.0及以上
+
+3. 依赖环境androidx
 
 
 ## 导入SDK
@@ -321,6 +323,7 @@ connectDevice(BluetoothDevice device)
 ## FAQ
 
 - 扫描不到蓝牙设备？
+
 1.查看App权限是否正常,6.0及以上系统必须要定位权限，且需要手动获取权限
 2.查看手机的定位服务是否开启,部分手机可能需要打开GPS
 3.拔掉电池重启秤
@@ -328,6 +331,7 @@ connectDevice(BluetoothDevice device)
 5.PabulumService是否在AndroidManifest中注册
 
 - 协议支持哪些单位？
+
 1.单位最多只支持8种，具体支持什么单位请通过getUnits()方法获取,如无法获取,请参照秤的出厂设置。
 
 

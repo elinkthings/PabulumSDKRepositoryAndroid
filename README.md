@@ -9,9 +9,11 @@
 [中文文档](README_CN.md)
 
 ## Conditions of Use
-1, Minimum version android4.4 (API 19)
-2, The Bluetooth version used by the device requires 4.0 and above
-3, Depends on the environment androidx
+1. Minimum version android4.4 (API 19)
+
+2. The Bluetooth version used by the device requires 4.0 and above
+
+3. Depends on the environment androidx
 
 ##  Import SDK
 
@@ -324,6 +326,7 @@ double weight; // Weight, corresponding unit g
 ## FAQ
 
 - Can't scan the Bluetooth device?
+
 1. Check whether the permissions of the App are normal. The 6.0 and above systems must locate the permissions and need to manually obtain the permissions
 2. Check whether the location service of the mobile phone is turned on, some mobile phones may need to turn on the GPS
 3. Unplug the battery and restart the scale
@@ -331,6 +334,7 @@ double weight; // Weight, corresponding unit g
 5. Is PabulumService registered in AndroidManifest
 
 - What units does the agreement support?
+
 1. Units can only support up to 8 types. For specific units, please obtain them by the getUnits () method. If they cannot be obtained, please refer to the factory settings of the scale.
 
 
