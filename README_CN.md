@@ -79,6 +79,7 @@ PabulumSDK.getInstance().init(this,"key","secret");
 
 
 - 在AndroidManifest.xml application标签下面增加
+
 ```
 <application>
     ...
@@ -249,10 +250,10 @@ connectDevice(BluetoothDevice device)
     }
 
 ```
+
 > 注意：这些接口或方法部分需要APP给体脂下发命令才会有返回数据.
 ##  APP给设备下发指令
 在BleProfileServiceReadyActivity.onServiceBinded(PabulumService.PabulumBinder binder)获得PabulumService.PabulumBinder的实例，调用binder里面方法
-
 
 ```
 秤支持的单位:getUnits();

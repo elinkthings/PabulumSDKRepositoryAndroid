@@ -81,6 +81,7 @@ PabulumSDK.getInstance (). Init (this, "key", "secret");
 ```
 
 - Add under AndroidManifest.xml application tag
+
 ```
 <application>
     ...
@@ -252,6 +253,7 @@ The following methods or interfaces can be automatically obtained directly after
 
 ```
 > Note: Some of these interfaces or methods require APP to issue commands to body fat to return data.
+
 ##   Give instructions to the device
 Get an instance of PabulumService.PabulumBinder in BleProfileServiceReadyActivity.onServiceBinded (PabulumService.PabulumBinder binder), call the method inside binder
 
@@ -286,6 +288,7 @@ Stop alarm command: stopAlarm ();
 
 ##   categories
 ####  FoodData (weight data)
+
 ```
 Type Parameter name Description
 String data; // Weight, corresponding to the current unit
