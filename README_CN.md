@@ -1,3 +1,4 @@
+[TOC]
 
 # 好营养SDK使用说明 - Android
 
@@ -5,7 +6,6 @@
 
 [aar包下载地址](https://github.com/elinkthings/PabulumSDKRepositoryAndroid/releases)
 
-[English documentation](README.md)
 
 
 

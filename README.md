@@ -1,3 +1,5 @@
+[TOC]
+
 # Pabulum SDK Instructions - Android
 
 [![](https://jitpack.io/v/elinkthings/PabulumSDKRepositoryAndroid.svg)](https://jitpack.io/#elinkthings/PabulumSDKRepositoryAndroid)
@@ -6,7 +8,7 @@
 
 [key registration](http://sdk.aicare.net.cn)
 
-[中文文档](README_CN.md)
+
 
 ## Conditions of Use
 1. Minimum version android4.4 (API 19)
