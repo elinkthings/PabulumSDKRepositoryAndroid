@@ -35,13 +35,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import cn.net.aicare.pabulumlibrary.PabulumSDK;
 import cn.net.aicare.pabulumlibrary.bleprofile.BleProfileService;
 import cn.net.aicare.pabulumlibrary.entity.FoodData;
 import cn.net.aicare.pabulumlibrary.pabulum.PabulumService;
 import cn.net.aicare.pabulumlibrary.utils.L;
 import cn.net.aicare.pabulumlibrary.utils.PabulumBleConfig;
 import cn.net.aicare.pabulumlibrary.utils.ParseData;
-
 
 public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryListener {
 
@@ -60,6 +60,8 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     TextView tvShowVersion;
     @BindView(R.id.rg_unit)
     RadioGroup rgUnit;
+    @BindView(R.id.rg_unit_two)
+    RadioGroup rgUnitTwo;
     @BindView(R.id.et_set_weight)
     EditText etSetWeight;
     @BindView(R.id.tv_show_result)
@@ -69,13 +71,9 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     @BindView(R.id.tv_show_time)
     TextView tv_show_time;
 
-    @OnClick({R.id.btn_title_right, R.id.tv_show_state, R.id.btn_set_weight, R.id.btn_tare,
-            R.id.btn_power_off, R.id.btn_cal, R.id.btn_all_cal, R.id.btn_fat, R.id.btn_all_fat,
-            R.id.btn_pro, R.id.btn_all_pro, R.id.btn_car, R.id.btn_all_car, R.id.btn_fib,
-            R.id.btn_all_fib, R.id.btn_cho, R.id.btn_all_cho, R.id.btn_sod, R.id.btn_all_sod,
-            R.id.btn_sug, R.id.btn_all_sug, R.id.btn_write_value, R.id.btn_did,
-            R.id.btn_get_version, R.id.btn_start, R.id.btn_start_less, R.id.btn_pause,
-            R.id.btn_reset, R.id.btn_pause_less})
+    @OnClick({R.id.btn_title_right, R.id.tv_show_state, R.id.btn_set_weight, R.id.btn_tare, R.id.btn_power_off, R.id.btn_cal, R.id.btn_all_cal, R.id.btn_fat, R.id.btn_all_fat, R.id.btn_pro,
+            R.id.btn_all_pro, R.id.btn_car, R.id.btn_all_car, R.id.btn_fib, R.id.btn_all_fib, R.id.btn_cho, R.id.btn_all_cho, R.id.btn_sod, R.id.btn_all_sod, R.id.btn_sug, R.id.btn_all_sug,
+            R.id.btn_write_value, R.id.btn_did, R.id.btn_get_version, R.id.btn_start, R.id.btn_start_less, R.id.btn_pause, R.id.btn_reset, R.id.btn_pause_less, R.id.btn_get_units})
     void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_title_right:
@@ -108,44 +106,50 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
                     handler.postDelayed(disconnectRunnable, 1000);
                 }
                 break;
+            //获取DID  2018-12-3
             case R.id.btn_did:
                 if (binder != null) {
+                    L.i(TAG, "点击请求获取did");
                     binder.getDid();
                 }
                 break;
             //2019/4/29
             case R.id.btn_start:
                 if (binder != null) {
+                    L.i(TAG, "开始计时");
                     binder.startTime();
                 }
-                break;    //2019/6/25
+                break;    //2019/5/22
             case R.id.btn_start_less:
                 if (binder != null) {
+                    L.i(TAG, "倒计时开始");
                     binder.startTimeLess(180);
                 }
                 break;
             //2019/6/25
             case R.id.btn_pause:
                 if (binder != null) {
-                    L.i(TAG, "Positive timing pause");
+                    L.i(TAG, "正计时暂停");
                     binder.pauseTime(80);
                 }
                 break;
             //2019/6/25
             case R.id.btn_pause_less:
                 if (binder != null) {
-                    L.i(TAG, "Countdown pause");
+                    L.i(TAG, "倒计时暂停");
                     binder.pauseTimeLess(90);
                 }
                 break;
             //2019/4/29
             case R.id.btn_reset:
                 if (binder != null) {
+                    L.i(TAG, "重置计时");
                     binder.resetTime();
                 }
                 break;
             case R.id.btn_write_value:
                 if (binder != null) {
+                    //透传数据测试
                     byte[] value = initRandomByteArr(new Random().nextInt(21));
                     L.e(TAG, "value: " + ParseData.arr2Str(value));
                     binder.writeValue(value);
@@ -153,7 +157,15 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
                 break;
             case R.id.btn_get_version:
                 if (binder != null) {
+                    L.i(TAG, "点击请求获取版本号");
                     binder.getVersion();
+
+                }
+                break;
+            case R.id.btn_get_units:
+                if (binder != null) {
+                    L.i(TAG, "点击请求获取单位列表");
+                    binder.getUnits();
 
                 }
                 break;
@@ -178,7 +190,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         if (TextUtils.isEmpty(data)) {
             T.showShort(this, R.string.pls_input_weight);
         } else {
-            int wei = Integer.valueOf(data);
+            int wei = Integer.parseInt(data);
             if (binder != null) {
                 switch (id) {
                     case R.id.btn_cal:
@@ -234,7 +246,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         }
     }
 
-    @OnCheckedChanged({R.id.rb_g, R.id.rb_lb, R.id.rb_ml, R.id.rb_oz, R.id.rb_kg, R.id.rb_fg})
+    @OnCheckedChanged({R.id.rb_g, R.id.rb_lb, R.id.rb_ml, R.id.rb_oz, R.id.rb_kg, R.id.rb_fg, R.id.rb_ml_milk, R.id.rb_ml_water, R.id.rb_floz_milk, R.id.rb_floz_water, R.id.rb_lb_lb})
     void onCheckedChange(RadioButton radioButton, boolean isChecked) {
         if (isBleChangeUnit) {
             isBleChangeUnit = false;
@@ -272,6 +284,31 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
                         binder.setUnit(PabulumBleConfig.UNIT_FG);
                     }
                     break;
+                case R.id.rb_ml_milk:
+                    if (binder != null) {
+                        binder.setUnit(PabulumBleConfig.UNIT_ML_MILK);
+                    }
+                    break;
+                case R.id.rb_ml_water:
+                    if (binder != null) {
+                        binder.setUnit(PabulumBleConfig.UNIT_ML_WATER);
+                    }
+                    break;
+                case R.id.rb_floz_milk:
+                    if (binder != null) {
+                        binder.setUnit(PabulumBleConfig.UNIT_FL_OZ_MILK);
+                    }
+                    break;
+                case R.id.rb_floz_water:
+                    if (binder != null) {
+                        binder.setUnit(PabulumBleConfig.UNIT_FL_OZ_WATER);
+                    }
+                    break;
+                case R.id.rb_lb_lb:
+                    if (binder != null) {
+                        binder.setUnit(PabulumBleConfig.UNIT_LB_LB);
+                    }
+                    break;
             }
         }
     }
@@ -291,14 +328,16 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         super.onCreate(savedInstanceState);
         L.isDebug = true;
         setContentView(R.layout.main);
+//        PabulumSDK.getInstance().init(this, "66617c04a3bbc7d2", "001814ae6212dd8c4657444c4b");
+        PabulumSDK.getInstance().init(this);
         initData();
         ButterKnife.bind(this);
         initViews();
         if (!AppUtils.isLocServiceEnable(this)) {
-            T.showShort(this,this.getString(R.string.permissions_server));
+            T.showShort(this, this.getString(R.string.permissions_server));
         }
 
-        if (ensureBLESupported()) {
+        if (ensureBLESupported()) {//判断设备是否支持BLE，true（支持），反之则反。
 
             initPermissions();
         }
@@ -321,7 +360,11 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     }
 
 
-
+    /**
+     * 设置状态信息
+     *
+     * @param object
+     */
     private void setState(Object object) {
         if (object instanceof Integer) {
             tvShowState.setText((Integer) object);
@@ -330,14 +373,17 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         }
     }
 
-
+    /**
+     * 设置信号显示
+     *
+     * @param object
+     */
     private void setCurrentRssi(Object object) {
         if (object == null) {
             tvShowRssi.setText(R.string.no_rssi);
         } else {
             if (object instanceof Integer) {
-                tvShowRssi.setText(String.format(getResources().getString(R.string.current_rssi),
-                        (Integer) object));
+                tvShowRssi.setText(String.format(getResources().getString(R.string.current_rssi), (Integer) object));
             }
         }
     }
@@ -351,61 +397,45 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     @Override
     protected void getTimeStatus(int status) {
         //2019/4/29
-        Toast.makeText(MainActivity.this, "getTimeStatus:" + status, Toast.LENGTH_SHORT).show();
+        L.i(TAG, "获取操作状态:" + status);
+        Toast.makeText(MainActivity.this, "操作状态:" + status, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void getCountdownStart(int time) {
         //2019/5/22
-        Toast.makeText(MainActivity.this, "getCountdownStart:" + time, Toast.LENGTH_SHORT).show();
+        L.i(TAG, "倒计时开始:" + time);
+        Toast.makeText(MainActivity.this, "倒计时开始:" + time, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void getSynTime(byte cmdType, int timeS) {
         //2019/5/22
-       String tyepName="";
+        String tyepName = "";
         switch (cmdType) {
 
             case PabulumBleConfig.SYN_TIME:
-                tyepName="Time synchronization";
+                //时间同步
+                tyepName = "时间同步";
                 break;
             case PabulumBleConfig.SYN_TIME_LESS:
-                tyepName="Countdown time synchronization";
+                //倒计时时间同步
+                tyepName = "倒计时时间同步";
                 break;
             case PabulumBleConfig.TIMING_PAUSE:
-                tyepName="Positive timing pause";
-                Toast.makeText(MainActivity.this,"Positive timing pause", Toast.LENGTH_SHORT).show();
+                //正计时暂停时间同步
+                tyepName = "正计时暂停时间同步";
+                Toast.makeText(MainActivity.this, "正计时暂停", Toast.LENGTH_SHORT).show();
                 break;
             case PabulumBleConfig.TIMING_PAUSE_LESS:
-                tyepName="Countdown pause";
-                Toast.makeText(MainActivity.this,"Countdown pause", Toast.LENGTH_SHORT).show();
+                //倒计时暂停时间同步
+                tyepName = "倒计时暂停时间同步";
+                Toast.makeText(MainActivity.this, "倒计时暂停", Toast.LENGTH_SHORT).show();
                 break;
 
         }
-        L.i(TAG, "TIME:" + timeS + "||" + tyepName);
+        L.i(TAG, "获取时间同步:" + timeS + "||" + tyepName);
         tv_show_time.setText("TIME:" + timeS);
-    }
-
-    @Override
-    protected void getBleDID(int did) {
-        L.i(TAG, "getBleDID:" + did);
-        tvShowDid.setText("DID:" + did);
-    }
-
-
-    @Override
-    protected void getUnits(int[] units) {
-        L.i(TAG, "支持的单位列表 = " + Arrays.toString(units));
-    }
-
-    @Override
-    protected void getErrCodes(int[] ints) {
-        super.getErrCodes(ints);
-    }
-
-    @Override
-    protected void getStopAlarm() {
-        super.getStopAlarm();
     }
 
     @Override
@@ -414,16 +444,30 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
 
     }
 
+    @Override
+    protected void getBleDID(int did) {
+        L.i(TAG, "获取did成功:" + did);
+        tvShowDid.setText("DID:" + did);
+    }
+
+    /**
+     * 设置右边title
+     *
+     * @param rssi
+     */
     private void setTitleRight(int rssi) {
         btnTitleRight.setText(String.format(getResources().getString(R.string.default_rssi), rssi));
     }
 
     @Override
-    protected void onServiceBinded(BleProfileService.LocalBinder binder) {
-
+    protected void onServiceBinded(BleProfileService.LocalBinder binder) {//成功绑定服务
+        /*
+        获取服务的binder通过binder执行蓝牙操作
+         */
         this.binder = (PabulumService.PabulumBinder) binder;
-        this.binder.getDeviceAddress();
-        this.binder.getDeviceName();
+        this.binder.getDeviceAddress();//获取当前连接设备的蓝牙地址
+        this.binder.getDeviceName();//获取当前连接设备的名称
+        L.e(TAG, "onServiceBinded绑定服务成功:" + binder);
     }
 
     @Override
@@ -433,8 +477,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
             case BleProfileService.STATE_CONNECTED:
                 L.e(TAG, "onDeviceConnected");
                 if (binder != null) {
-                    setState(String.format(getResources().getString(R.string.current_device),
-                            binder.getDeviceAddress()));
+                    setState(String.format(getResources().getString(R.string.current_device), binder.getDeviceAddress()));
                 }
                 break;
             case BleProfileService.STATE_DISCONNECTED:
@@ -449,10 +492,10 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
                     }
                 }, 1000);
                 break;
-            case BleProfileService.STATE_INDICATION_SUCCESS:
+            case BleProfileService.STATE_INDICATION_SUCCESS://订阅蓝牙服务成功
                 L.e(TAG, "onIndicationSuccess");
                 if (binder != null) {
-                    binder.setUnit(preUnit);
+                    binder.setUnit(preUnit);//设置单位（订阅成功后，同步APP单位到蓝牙，保持两端单位一致）
                 }
                 rgUnit.check(R.id.rb_g);
                 break;
@@ -464,7 +507,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         T.showLong(this, "msg = " + msg + "; code = " + errorCode);
     }
 
-    private int countRssi = 0;
+    private int countRssi = 0;//判断是否需要断开
 
     @Override
     public void onReadRssi(int rssi) {
@@ -482,16 +525,25 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         }
     }
 
-    private int countWei = 0;
+    private int countWei = 0;//判断数据是否稳定
 
     @Override
-    protected void getUnit(byte unitType) {
+    protected void getUnit(byte unitType) {//秤返回的单位信息
         L.e(TAG, "unitType = " + unitType);
+        preUnit = unitType;
+        showUnit(preUnit);
+    }
+
+
+    @Override
+    protected void getUnits(int[] units) {//支持的单位列表
+        L.e(TAG, "支持的单位列表 = " + Arrays.toString(units));
     }
 
     @Override
     protected void getBleVersion(String version) {
         L.e(TAG, "version = " + version);
+        T.showShort(this, "获取版本号成功");
         setBleVersion(String.format(getResources().getString(R.string.ble_version), version));
     }
 
@@ -508,7 +560,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     }
 
     @Override
-    protected void bluetoothStateOn() {
+    protected void bluetoothStateOn() {//蓝牙已开启
         super.bluetoothStateOn();
         setState(R.string.ble_state_on);
         L.e(TAG, "bluetoothStateOn");
@@ -525,7 +577,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
 
     @Override
     protected void getFoodData(FoodData foodData) {
-        if (foodData == null) {//2017-06-16
+        if (foodData == null) {//2017-06-16为空直接返回
             return;
         }
         L.e(TAG, "weight = " + foodData.getData());
@@ -544,46 +596,108 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         if (foodData.getUnit() != preUnit) {
             preUnit = foodData.getUnit();
             isBleChangeUnit = true;
-            switch (preUnit) {
-                case PabulumBleConfig.UNIT_G:
-                    rgUnit.check(R.id.rb_g);
-                    break;
-                case PabulumBleConfig.UNIT_ML:
-                    rgUnit.check(R.id.rb_ml);
-                    break;
-                case PabulumBleConfig.UNIT_LB:
-                    rgUnit.check(R.id.rb_lb);
-                    break;
-                case PabulumBleConfig.UNIT_OZ:
-                    rgUnit.check(R.id.rb_oz);
-                    break;
-                case PabulumBleConfig.UNIT_KG:
-                    rgUnit.check(R.id.rb_kg);
-                    break;
-                case PabulumBleConfig.UNIT_FG:
-                    rgUnit.check(R.id.rb_fg);
-                    break;
-            }
+            showUnit(preUnit);
         }
+        String unitStr = getUnitStr(preUnit);
 
-        tvShowResult.setText(preWeight + "\n" + foodData.getDeviceType() + "\n" + foodData.getWeight());
+        tvShowResult.setText(preWeight+" "+unitStr  + "\nType:" + foodData.getDeviceType()+ "\n" + foodData.getWeight() + "g");
+    }
+
+
+    private void showUnit(int preUnit) {
+        switch (preUnit) {
+            case PabulumBleConfig.UNIT_G:
+                rgUnit.check(R.id.rb_g);
+                break;
+            case PabulumBleConfig.UNIT_ML:
+                rgUnit.check(R.id.rb_ml);
+                break;
+            case PabulumBleConfig.UNIT_LB:
+                rgUnit.check(R.id.rb_lb);
+                break;
+            case PabulumBleConfig.UNIT_OZ:
+                rgUnit.check(R.id.rb_oz);
+                break;
+            case PabulumBleConfig.UNIT_KG:
+                rgUnit.check(R.id.rb_kg);
+                break;
+            case PabulumBleConfig.UNIT_FG:
+                rgUnit.check(R.id.rb_fg);
+                break;
+            case PabulumBleConfig.UNIT_ML_MILK:
+                rgUnitTwo.check(R.id.rb_ml_milk);
+                break;
+            case PabulumBleConfig.UNIT_ML_WATER:
+                rgUnitTwo.check(R.id.rb_ml_water);
+                break;
+            case PabulumBleConfig.UNIT_FL_OZ_MILK:
+                rgUnitTwo.check(R.id.rb_floz_milk);
+                break;
+            case PabulumBleConfig.UNIT_FL_OZ_WATER:
+                rgUnitTwo.check(R.id.rb_floz_water);
+                break;
+            case PabulumBleConfig.UNIT_LB_LB:
+                rgUnitTwo.check(R.id.rb_lb_lb);
+                break;
+        }
+    }
+
+
+    private String getUnitStr(int preUnit) {
+        String unitStr=getString(R.string.unit_g);
+        switch (preUnit) {
+            case PabulumBleConfig.UNIT_G:
+                unitStr=getString(R.string.unit_g);
+                break;
+            case PabulumBleConfig.UNIT_ML:
+                unitStr=getString(R.string.unit_ml);
+                break;
+            case PabulumBleConfig.UNIT_LB:
+                unitStr=getString(R.string.unit_lb_oz);
+                break;
+            case PabulumBleConfig.UNIT_OZ:
+                unitStr=getString(R.string.unit_oz);
+                break;
+            case PabulumBleConfig.UNIT_KG:
+                unitStr=getString(R.string.unit_kg);
+                break;
+            case PabulumBleConfig.UNIT_FG:
+                unitStr=getString(R.string.unit_fg);
+                break;
+            case PabulumBleConfig.UNIT_ML_MILK:
+                unitStr=getString(R.string.unit_ml_milk);
+                break;
+            case PabulumBleConfig.UNIT_ML_WATER:
+                unitStr=getString(R.string.unit_ml_water);
+                break;
+            case PabulumBleConfig.UNIT_FL_OZ_MILK:
+                unitStr=getString(R.string.unit_oz_milk);
+                break;
+            case PabulumBleConfig.UNIT_FL_OZ_WATER:
+                unitStr=getString(R.string.unit_oz_water);
+                break;
+            case PabulumBleConfig.UNIT_LB_LB:
+                unitStr=getString(R.string.unit_lb);
+                break;
+        }
+        return unitStr;
     }
 
     @Override
-    protected void bluetoothStateOff() {
+    protected void bluetoothStateOff() {//蓝牙已关闭
         super.bluetoothStateOff();
         setState(R.string.ble_state_off);
         L.e(TAG, "bluetoothStateOff");
     }
 
     @Override
-    protected void bluetoothTurningOff() {
+    protected void bluetoothTurningOff() {//蓝牙正在关闭
         super.bluetoothTurningOff();
         L.e(TAG, "bluetoothTurningOff");
     }
 
     @Override
-    protected void bluetoothTurningOn() {
+    protected void bluetoothTurningOn() {//蓝牙正在打开
         super.bluetoothTurningOn();
         L.e(TAG, "bluetoothTurningOn");
     }
@@ -594,7 +708,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         L.e(TAG, "onDestroy");
         stopScan();
         if (binder != null) {
-            binder.disconnect();
+            binder.disconnect();//若Activity关闭时，不需要继续保持连接，可以在此断开连接
         }
     }
 
@@ -624,35 +738,36 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     }
 
 
-
+    /**
+     * 初始化请求权限
+     */
     private void initPermissions() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode != 1) {
             return;
         }
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startScan();
+            startScan();//开始扫描
         } else {
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
-                new AlertDialog.Builder(this).setTitle(this.getString(R.string.hint)).setMessage(this.getString(R.string.permissions)).setPositiveButton(this.getString(R.string.query), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package",
-                                getApplicationContext().getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
-                    }
-                }).setNegativeButton(getString(R.string.cancel),
-                        new DialogInterface.OnClickListener() {
+                //权限请求失败，但未选中“不再提示”选项
+                new AlertDialog.Builder(this).setTitle(this.getString(R.string.hint)).setMessage(this.getString(R.string.permissions))
+                        .setPositiveButton(this.getString(R.string.query), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //引导用户至设置页手动授权
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getApplicationContext().getPackageName(), null);
+                                intent.setData(uri);
+                                startActivity(intent);
+                            }
+                        }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (dialog != null) {
@@ -661,18 +776,20 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
                     }
                 }).show();
             } else {
-                new AlertDialog.Builder(this).setTitle(this.getString(R.string.hint)).setMessage(this.getString(R.string.permissions)).setPositiveButton(this.getString(R.string.query), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package",
-                                getApplicationContext().getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
+                //权限请求失败，选中“不再提示”选项
+//                T.showShort(MainActivity.this, "获取权限失败");
+                new AlertDialog.Builder(this).setTitle(this.getString(R.string.hint)).setMessage(this.getString(R.string.permissions))
+                        .setPositiveButton(this.getString(R.string.query), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //引导用户至设置页手动授权
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getApplicationContext().getPackageName(), null);
+                                intent.setData(uri);
+                                startActivity(intent);
 
-                    }
-                }).setNegativeButton(getString(R.string.cancel),
-                        new DialogInterface.OnClickListener() {
+                            }
+                        }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (dialog != null) {

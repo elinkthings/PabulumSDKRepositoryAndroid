@@ -42,4 +42,18 @@
     <string name="hint">提示</string>
     <string name="permissions">请求使用定位权限搜索蓝牙设备</string>
     <string name="permissions_server">没有开启定位服务</string>
+
+    <string name="unit_g">g</string>
+    <string name="unit_ml">ml</string>
+    <string name="unit_lb_oz">lb:oz</string>
+    <string name="unit_oz">oz</string>
+    <string name="unit_kg">kg</string>
+    <string name="unit_fg">斤</string>
+    <string name="unit_ml_milk">ml(牛奶)</string>
+    <string name="unit_ml_water">ml(水)</string>
+    <string name="unit_oz_milk">oz(牛奶)</string>
+    <string name="unit_oz_water">oz(水)</string>
+    <string name="unit_lb">lb</string>
+
+
 </resources>
