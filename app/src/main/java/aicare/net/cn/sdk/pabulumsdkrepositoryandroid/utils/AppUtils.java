@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.LocationManager;
 
+//跟App相关的辅助类
 public class AppUtils {
 
     private AppUtils() {
@@ -14,7 +15,9 @@ public class AppUtils {
 
     }
 
-
+    /**
+     * 获取应用程序名称
+     */
     public static String getAppName(Context context) {
         try {
             PackageManager packageManager = context.getPackageManager();
@@ -28,7 +31,12 @@ public class AppUtils {
         return null;
     }
 
-
+    /**
+     * [获取应用程序版本名称信息]
+     *
+     * @param context
+     * @return 当前应用的版本名称
+     */
     public static String getVersionName(Context context) {
         try {
             PackageManager packageManager = context.getPackageManager();
@@ -43,7 +51,9 @@ public class AppUtils {
     }
 
 
-
+    /**
+     * 手机是否开启位置服务
+     */
     public static boolean isLocServiceEnable(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);

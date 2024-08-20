@@ -3,6 +3,7 @@ package aicare.net.cn.sdk.pabulumsdkrepositoryandroid.utils;
 import android.content.Context;
 import android.widget.Toast;
 
+//Toast统一管理类
 public class T {
 
 	private T() {
@@ -12,7 +13,12 @@ public class T {
 
 	private static Toast mToast;
 
-
+	/**
+	 * 短时间显示Toast
+	 * 
+	 * @param context
+	 * @param message
+	 */
 	public static void showShort(Context context, CharSequence message) {
 		if (mToast == null) {
 			mToast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
@@ -23,6 +29,12 @@ public class T {
 		mToast.show();
 	}
 
+	/**
+	 * 短时间显示Toast
+	 * 
+	 * @param context
+	 * @param message
+	 */
 	public static void showShort(Context context, int message) {
 		if (mToast == null) {
 			mToast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
@@ -33,7 +45,12 @@ public class T {
 		mToast.show();
 	}
 
-
+	/**
+	 * 长时间显示Toast
+	 * 
+	 * @param context
+	 * @param message
+	 */
 	public static void showLong(Context context, CharSequence message) {
 		if (mToast == null) {
 			mToast = Toast.makeText(context, message, Toast.LENGTH_LONG);
@@ -44,7 +61,12 @@ public class T {
 		mToast.show();
 	}
 
-
+	/**
+	 * 长时间显示Toast
+	 * 
+	 * @param context
+	 * @param message
+	 */
 	public static void showLong(Context context, int message) {
 		if (mToast == null) {
 			mToast = Toast.makeText(context, message, Toast.LENGTH_LONG);
@@ -55,7 +77,13 @@ public class T {
 		mToast.show();
 	}
 
-
+	/**
+	 * 自定义显示Toast时间
+	 * 
+	 * @param context
+	 * @param message
+	 * @param duration
+	 */
 	public static void show(Context context, CharSequence message, int duration) {
 		if (mToast == null) {
 			mToast = Toast.makeText(context, message, duration);
@@ -66,7 +94,13 @@ public class T {
 		mToast.show();
 	}
 
-
+	/**
+	 * 自定义显示Toast时间
+	 * 
+	 * @param context
+	 * @param message
+	 * @param duration
+	 */
 	public static void show(Context context, int message, int duration) {
 		if (mToast == null) {
 			mToast = Toast.makeText(context, message, duration);

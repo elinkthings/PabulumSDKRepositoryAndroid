@@ -10,7 +10,6 @@ import cn.net.aicare.pabulumlibrary.bleprofile.BleProfileService;
 import cn.net.aicare.pabulumlibrary.bleprofile.BleProfileServiceReadyActivity;
 import cn.net.aicare.pabulumlibrary.entity.FoodData;
 
-
 public abstract class BaseActivity extends BleProfileServiceReadyActivity {
 
     @Override
@@ -78,17 +77,7 @@ public abstract class BaseActivity extends BleProfileServiceReadyActivity {
     }
 
     @Override
-    protected void getBleDID(int did) {
-
-    }
-
-    @Override
-    protected void getUnits(int[] ints) {
-
-    }
-
-    @Override
-    protected void getErrCodes(int[] ints) {
+    protected void getErrCodes(int[] errCodes) {
 
     }
 
@@ -98,7 +87,12 @@ public abstract class BaseActivity extends BleProfileServiceReadyActivity {
     }
 
     @Override
-    protected void getPenetrateData(byte[] bytes) {
+    protected void getPenetrateData(byte[] data) {
+
+    }
+
+    @Override
+    protected void getBleDID(int did) {
 
     }
 
@@ -112,5 +106,8 @@ public abstract class BaseActivity extends BleProfileServiceReadyActivity {
 
     }
 
+    @Override
+    protected void getUnits(int[] units) {
 
+    }
 }

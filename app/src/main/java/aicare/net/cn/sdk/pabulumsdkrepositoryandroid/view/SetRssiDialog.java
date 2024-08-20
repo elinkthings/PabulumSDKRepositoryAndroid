@@ -53,12 +53,14 @@ public class SetRssiDialog extends Dialog implements View.OnClickListener {
         setEvents();
     }
 
-
+    /**
+     * 设置dialog宽度
+     */
     private void setDialogWidth() {
         Window dialogWindow = getWindow();
         WindowManager.LayoutParams lp = dialogWindow.getAttributes();
-        DisplayMetrics d = context.getResources().getDisplayMetrics();
-        lp.width = (int) (d.widthPixels * 0.8);
+        DisplayMetrics d = context.getResources().getDisplayMetrics(); // 获取屏幕宽、高用
+        lp.width = (int) (d.widthPixels * 0.8); // 宽度设置为屏幕的0.8
         dialogWindow.setAttributes(lp);
     }
 
