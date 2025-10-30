@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -14,10 +15,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -28,13 +31,6 @@ import aicare.net.cn.sdk.pabulumsdkrepositoryandroid.utils.Config;
 import aicare.net.cn.sdk.pabulumsdkrepositoryandroid.utils.SPUtils;
 import aicare.net.cn.sdk.pabulumsdkrepositoryandroid.utils.T;
 import aicare.net.cn.sdk.pabulumsdkrepositoryandroid.view.SetRssiDialog;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
-import butterknife.OnClick;
 import cn.net.aicare.pabulumlibrary.PabulumSDK;
 import cn.net.aicare.pabulumlibrary.bleprofile.BleProfileService;
 import cn.net.aicare.pabulumlibrary.entity.FoodData;
@@ -43,135 +39,109 @@ import cn.net.aicare.pabulumlibrary.utils.L;
 import cn.net.aicare.pabulumlibrary.utils.PabulumBleConfig;
 import cn.net.aicare.pabulumlibrary.utils.ParseData;
 
-public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryListener {
+public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryListener, View.OnClickListener,
+        RadioGroup.OnCheckedChangeListener {
 
     private final static String TAG = MainActivity.class.getSimpleName();
-    @BindView(R.id.ib_title_left)
-    ImageButton ibTitleLeft;
-    @BindView(R.id.tv_title_middle)
-    TextView tvTitleMiddle;
-    @BindView(R.id.btn_title_right)
-    Button btnTitleRight;
-    @BindView(R.id.tv_show_state)
-    TextView tvShowState;
-    @BindView(R.id.tv_show_rssi)
-    TextView tvShowRssi;
-    @BindView(R.id.tv_show_version)
-    TextView tvShowVersion;
-    @BindView(R.id.rg_unit)
-    RadioGroup rgUnit;
-    @BindView(R.id.rg_unit_two)
-    RadioGroup rgUnitTwo;
-    @BindView(R.id.et_set_weight)
-    EditText etSetWeight;
-    @BindView(R.id.tv_show_result)
-    TextView tvShowResult;
-    @BindView(R.id.tv_show_did)
-    TextView tvShowDid;
-    @BindView(R.id.tv_show_time)
-    TextView tv_show_time;
+    private ImageButton ib_title_left;
+    private TextView tv_title_middle;
+    private Button btn_title_right;
+    private TextView tv_show_state;
+    private TextView tv_show_rssi;
+    private TextView tv_show_version;
+    private RadioGroup rg_unit;
+    private RadioGroup rg_unit_two;
+    private EditText et_set_weight;
+    private TextView tv_show_result;
+    private TextView tv_show_did;
+    private TextView tv_show_time;
 
-    @OnClick({R.id.btn_title_right, R.id.tv_show_state, R.id.btn_set_weight, R.id.btn_tare, R.id.btn_power_off, R.id.btn_cal, R.id.btn_all_cal, R.id.btn_fat, R.id.btn_all_fat, R.id.btn_pro,
-            R.id.btn_all_pro, R.id.btn_car, R.id.btn_all_car, R.id.btn_fib, R.id.btn_all_fib, R.id.btn_cho, R.id.btn_all_cho, R.id.btn_sod, R.id.btn_all_sod, R.id.btn_sug, R.id.btn_all_sug,
-            R.id.btn_write_value, R.id.btn_did, R.id.btn_get_version, R.id.btn_start, R.id.btn_start_less, R.id.btn_pause, R.id.btn_reset, R.id.btn_pause_less, R.id.btn_get_units})
-    void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_title_right:
-                new SetRssiDialog(this, defaultRssi, this).show();
-                break;
-            case R.id.tv_show_state:
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        if (id == R.id.btn_title_right) {
+            new SetRssiDialog(this, defaultRssi, this).show();
+        } else if (id == R.id.tv_show_state) {
+            if (binder != null) {
+                binder.disconnect();
+            }
+        } else if (id == R.id.btn_set_weight) {
+            String weight = et_set_weight.getText().toString().trim();
+            if (TextUtils.isEmpty(weight)) {
+                T.showShort(this, R.string.pls_input_weight);
+            } else {
+                int wei = Integer.valueOf(weight);
                 if (binder != null) {
-                    binder.disconnect();
+                    binder.setWeight(wei);
                 }
-                break;
-            case R.id.btn_set_weight:
-                String weight = etSetWeight.getText().toString().trim();
-                if (TextUtils.isEmpty(weight)) {
-                    T.showShort(this, R.string.pls_input_weight);
-                } else {
-                    int wei = Integer.valueOf(weight);
-                    if (binder != null) {
-                        binder.setWeight(wei);
-                    }
-                }
-                break;
-            case R.id.btn_tare:
-                if (binder != null) {
-                    binder.netWeight();
-                }
-                break;
-            case R.id.btn_power_off:
-                if (binder != null) {
-                    binder.powerOff();
-                    handler.postDelayed(disconnectRunnable, 1000);
-                }
-                break;
+            }
+        } else if (id == R.id.btn_tare) {
+            if (binder != null) {
+                binder.netWeight();
+            }
+        } else if (id == R.id.btn_power_off) {
+            if (binder != null) {
+                binder.powerOff();
+                handler.postDelayed(disconnectRunnable, 1000);
+            }
             //获取DID  2018-12-3
-            case R.id.btn_did:
-                if (binder != null) {
-                    L.i(TAG, "点击请求获取did");
-                    binder.getDid();
-                }
-                break;
+        } else if (id == R.id.btn_did) {
+            if (binder != null) {
+                L.i(TAG, "点击请求获取did");
+                binder.getDid();
+            }
             //2019/4/29
-            case R.id.btn_start:
-                if (binder != null) {
-                    L.i(TAG, "开始计时");
-                    binder.startTime();
-                }
-                break;    //2019/5/22
-            case R.id.btn_start_less:
-                if (binder != null) {
-                    L.i(TAG, "倒计时开始");
-                    binder.startTimeLess(180);
-                }
-                break;
+        } else if (id == R.id.btn_start) {
+            if (binder != null) {
+                L.i(TAG, "开始计时");
+                binder.startTime();
+            }
+            //2019/5/22
+        } else if (id == R.id.btn_start_less) {
+            if (binder != null) {
+                L.i(TAG, "倒计时开始");
+                binder.startTimeLess(180);
+            }
             //2019/6/25
-            case R.id.btn_pause:
-                if (binder != null) {
-                    L.i(TAG, "正计时暂停");
-                    binder.pauseTime(80);
-                }
-                break;
+        } else if (id == R.id.btn_pause) {
+            if (binder != null) {
+                L.i(TAG, "正计时暂停");
+                binder.pauseTime(80);
+            }
             //2019/6/25
-            case R.id.btn_pause_less:
-                if (binder != null) {
-                    L.i(TAG, "倒计时暂停");
-                    binder.pauseTimeLess(90);
-                }
-                break;
+        } else if (id == R.id.btn_pause_less) {
+            if (binder != null) {
+                L.i(TAG, "倒计时暂停");
+                binder.pauseTimeLess(90);
+            }
             //2019/4/29
-            case R.id.btn_reset:
-                if (binder != null) {
-                    L.i(TAG, "重置计时");
-                    binder.resetTime();
-                }
-                break;
-            case R.id.btn_write_value:
-                if (binder != null) {
-                    //透传数据测试
-                    byte[] value = initRandomByteArr(new Random().nextInt(21));
-                    L.e(TAG, "value: " + ParseData.arr2Str(value));
-                    binder.writeValue(value);
-                }
-                break;
-            case R.id.btn_get_version:
-                if (binder != null) {
-                    L.i(TAG, "点击请求获取版本号");
-                    binder.getVersion();
+        } else if (id == R.id.btn_reset) {
+            if (binder != null) {
+                L.i(TAG, "重置计时");
+                binder.resetTime();
+            }
+        } else if (id == R.id.btn_write_value) {
+            if (binder != null) {
+                //透传数据测试
+                byte[] value = initRandomByteArr(new Random().nextInt(21));
+                L.e(TAG, "value: " + ParseData.arr2Str(value));
+                binder.writeValue(value);
+            }
+        } else if (id == R.id.btn_get_version) {
+            if (binder != null) {
+                L.i(TAG, "点击请求获取版本号");
+                binder.getVersion();
 
-                }
-                break;
-            case R.id.btn_get_units:
-                if (binder != null) {
-                    L.i(TAG, "点击请求获取单位列表");
-                    binder.getUnits();
+            }
+        } else if (id == R.id.btn_get_units) {
+            if (binder != null) {
+                L.i(TAG, "点击请求获取单位列表");
+                binder.getUnits();
 
-                }
-                break;
-            default:
-                setData(view.getId());
-                break;
+            }
+        } else {
+            setData(view.getId());
         }
     }
 
@@ -186,132 +156,105 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     }
 
     private void setData(int id) {
-        String data = etSetWeight.getText().toString().trim();
+        String data = et_set_weight.getText().toString().trim();
         if (TextUtils.isEmpty(data)) {
             T.showShort(this, R.string.pls_input_weight);
         } else {
             int wei = Integer.parseInt(data);
             if (binder != null) {
-                switch (id) {
-                    case R.id.btn_cal:
-                        binder.setCal(wei);
-                        break;
-                    case R.id.btn_all_cal:
-                        binder.setAllCal(wei);
-                        break;
-                    case R.id.btn_fat:
-                        binder.setFat(wei);
-                        break;
-                    case R.id.btn_all_fat:
-                        binder.setAllFat(wei);
-                        break;
-                    case R.id.btn_pro:
-                        binder.setPro(wei);
-                        break;
-                    case R.id.btn_all_pro:
-                        binder.setAllPro(wei);
-                        break;
-                    case R.id.btn_car:
-                        binder.setCar(wei);
-                        break;
-                    case R.id.btn_all_car:
-                        binder.setAllCar(wei);
-                        break;
-                    case R.id.btn_fib:
-                        binder.setFib(wei);
-                        break;
-                    case R.id.btn_all_fib:
-                        binder.setAllFib(wei);
-                        break;
-                    case R.id.btn_cho:
-                        binder.setCho(wei);
-                        break;
-                    case R.id.btn_all_cho:
-                        binder.setAllCho(wei);
-                        break;
-                    case R.id.btn_sod:
-                        binder.setSod(wei);
-                        break;
-                    case R.id.btn_all_sod:
-                        binder.setAllSod(wei);
-                        break;
-                    case R.id.btn_sug:
-                        binder.setSug(wei);
-                        break;
-                    case R.id.btn_all_sug:
-                        binder.setAllSug(wei);
-                        break;
+                if (id == R.id.btn_cal) {
+                    binder.setCal(wei);
+                } else if (id == R.id.btn_all_cal) {
+                    binder.setAllCal(wei);
+                } else if (id == R.id.btn_fat) {
+                    binder.setFat(wei);
+                } else if (id == R.id.btn_all_fat) {
+                    binder.setAllFat(wei);
+                } else if (id == R.id.btn_pro) {
+                    binder.setPro(wei);
+                } else if (id == R.id.btn_all_pro) {
+                    binder.setAllPro(wei);
+                } else if (id == R.id.btn_car) {
+                    binder.setCar(wei);
+                } else if (id == R.id.btn_all_car) {
+                    binder.setAllCar(wei);
+                } else if (id == R.id.btn_fib) {
+                    binder.setFib(wei);
+                } else if (id == R.id.btn_all_fib) {
+                    binder.setAllFib(wei);
+                } else if (id == R.id.btn_cho) {
+                    binder.setCho(wei);
+                } else if (id == R.id.btn_all_cho) {
+                    binder.setAllCho(wei);
+                } else if (id == R.id.btn_sod) {
+                    binder.setSod(wei);
+                } else if (id == R.id.btn_all_sod) {
+                    binder.setAllSod(wei);
+                } else if (id == R.id.btn_sug) {
+                    binder.setSug(wei);
+                } else if (id == R.id.btn_all_sug) {
+                    binder.setAllSug(wei);
                 }
             }
         }
     }
 
-    @OnCheckedChanged({R.id.rb_g, R.id.rb_lb, R.id.rb_ml, R.id.rb_oz, R.id.rb_kg, R.id.rb_fg, R.id.rb_ml_milk, R.id.rb_ml_water, R.id.rb_floz_milk, R.id.rb_floz_water, R.id.rb_lb_lb})
-    void onCheckedChange(RadioButton radioButton, boolean isChecked) {
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        L.i("点击:" + checkedId+"   isBleChangeUnit="+isBleChangeUnit);
         if (isBleChangeUnit) {
             isBleChangeUnit = false;
             return;
         }
-        if (isChecked) {
-            switch (radioButton.getId()) {
-                case R.id.rb_g:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_G);
-                    }
-                    break;
-                case R.id.rb_ml:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_ML);
-                    }
-                    break;
-                case R.id.rb_lb:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_LB);
-                    }
-                    break;
-                case R.id.rb_oz:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_OZ);
-                    }
-                    break;
-                case R.id.rb_kg:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_KG);
-                    }
-                    break;
-                case R.id.rb_fg:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_FG);
-                    }
-                    break;
-                case R.id.rb_ml_milk:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_ML_MILK);
-                    }
-                    break;
-                case R.id.rb_ml_water:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_ML_WATER);
-                    }
-                    break;
-                case R.id.rb_floz_milk:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_FL_OZ_MILK);
-                    }
-                    break;
-                case R.id.rb_floz_water:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_FL_OZ_WATER);
-                    }
-                    break;
-                case R.id.rb_lb_lb:
-                    if (binder != null) {
-                        binder.setUnit(PabulumBleConfig.UNIT_LB_LB);
-                    }
-                    break;
+
+        int id = checkedId;
+        if (id == R.id.rb_g) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_G);
+            }
+        } else if (id == R.id.rb_ml) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_ML);
+            }
+        } else if (id == R.id.rb_lb) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_LB);
+            }
+        } else if (id == R.id.rb_oz) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_OZ);
+            }
+        } else if (id == R.id.rb_kg) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_KG);
+            }
+        } else if (id == R.id.rb_fg) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_FG);
+            }
+        } else if (id == R.id.rb_ml_milk) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_ML_MILK);
+            }
+        } else if (id == R.id.rb_ml_water) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_ML_WATER);
+            }
+        } else if (id == R.id.rb_floz_milk) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_FL_OZ_MILK);
+            }
+        } else if (id == R.id.rb_floz_water) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_FL_OZ_WATER);
+            }
+        } else if (id == R.id.rb_lb_lb) {
+            if (binder != null) {
+                binder.setUnit(PabulumBleConfig.UNIT_LB_LB);
             }
         }
     }
+
 
     private PabulumService.PabulumBinder binder;
     private int defaultRssi;
@@ -330,33 +273,60 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         setContentView(R.layout.main);
 //        PabulumSDK.getInstance().init(this, "66617c04a3bbc7d2", "001814ae6212dd8c4657444c4b");
         PabulumSDK.getInstance().init(this);
-        initData();
-        ButterKnife.bind(this);
         initViews();
+        initData();
+        initListener();
+        initPermissions();
         if (!AppUtils.isLocServiceEnable(this)) {
             T.showShort(this, this.getString(R.string.permissions_server));
         }
 
-        if (ensureBLESupported()) {//判断设备是否支持BLE，true（支持），反之则反。
-
-            initPermissions();
-        }
         reset();
     }
+
+    private void initListener() {
+        ib_title_left.setOnClickListener(this);
+        tv_title_middle.setOnClickListener(this);
+        btn_title_right.setOnClickListener(this);
+        tv_show_state.setOnClickListener(this);
+        tv_show_rssi.setOnClickListener(this);
+        tv_show_version.setOnClickListener(this);
+        tv_show_result.setOnClickListener(this);
+        tv_show_did.setOnClickListener(this);
+        tv_show_time.setOnClickListener(this);
+
+        rg_unit.setOnCheckedChangeListener(this);
+        rg_unit_two.setOnCheckedChangeListener(this);
+    }
+
+
+
 
     private void initData() {
         defaultRssi = (int) SPUtils.get(this, Config.DEFAULT_RSSI, DEFAULT_RSSI);
     }
 
     private void initViews() {
+        ib_title_left = findViewById(R.id.ib_title_left);
+        tv_title_middle = findViewById(R.id.tv_title_middle);
+        btn_title_right = findViewById(R.id.btn_title_right);
+        tv_show_state = findViewById(R.id.tv_show_state);
+        tv_show_rssi = findViewById(R.id.tv_show_rssi);
+        tv_show_version = findViewById(R.id.tv_show_version);
+        rg_unit = findViewById(R.id.rg_unit);
+        rg_unit_two = findViewById(R.id.rg_unit_two);
+        et_set_weight = findViewById(R.id.et_set_weight);
+        tv_show_result = findViewById(R.id.tv_show_result);
+        tv_show_did = findViewById(R.id.tv_show_did);
+        tv_show_time = findViewById(R.id.tv_show_time);
         setTitleRight(Math.abs(defaultRssi));
     }
 
     private void reset() {
         setCurrentRssi(null);
         setBleVersion(getResources().getString(R.string.no_version));
-        tvShowResult.setText(String.valueOf(preWeight));
-        tvShowResult.setTextColor(getResources().getColor(R.color.black_theme));
+        tv_show_result.setText(String.valueOf(preWeight));
+        tv_show_result.setTextColor(getResources().getColor(R.color.black_theme));
     }
 
 
@@ -367,9 +337,9 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
      */
     private void setState(Object object) {
         if (object instanceof Integer) {
-            tvShowState.setText((Integer) object);
+            tv_show_state.setText((Integer) object);
         } else if (object instanceof String) {
-            tvShowState.setText((String) object);
+            tv_show_state.setText((String) object);
         }
     }
 
@@ -380,16 +350,16 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
      */
     private void setCurrentRssi(Object object) {
         if (object == null) {
-            tvShowRssi.setText(R.string.no_rssi);
+            tv_show_rssi.setText(R.string.no_rssi);
         } else {
             if (object instanceof Integer) {
-                tvShowRssi.setText(String.format(getResources().getString(R.string.current_rssi), (Integer) object));
+                tv_show_rssi.setText(String.format(getResources().getString(R.string.current_rssi), (Integer) object));
             }
         }
     }
 
     private void setBleVersion(String version) {
-        tvShowVersion.setText(version);
+        tv_show_version.setText(version);
 
     }
 
@@ -447,7 +417,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     @Override
     protected void getBleDID(int did) {
         L.i(TAG, "获取did成功:" + did);
-        tvShowDid.setText("DID:" + did);
+        tv_show_did.setText("DID:" + did);
     }
 
     /**
@@ -456,7 +426,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
      * @param rssi
      */
     private void setTitleRight(int rssi) {
-        btnTitleRight.setText(String.format(getResources().getString(R.string.default_rssi), rssi));
+        btn_title_right.setText(String.format(getResources().getString(R.string.default_rssi), rssi));
     }
 
     @Override
@@ -497,7 +467,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
                 if (binder != null) {
                     binder.setUnit(preUnit);//设置单位（订阅成功后，同步APP单位到蓝牙，保持两端单位一致）
                 }
-                rgUnit.check(R.id.rb_g);
+                rg_unit.check(R.id.rb_g);
                 break;
         }
     }
@@ -511,7 +481,6 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
 
     @Override
     public void onReadRssi(int rssi) {
-        L.e(TAG, "onReadRssi rssi: " + rssi);
         setCurrentRssi(Math.abs(rssi));
         if (Math.abs(rssi) > Math.abs(defaultRssi)) {
             countRssi += 1;
@@ -538,6 +507,7 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
     @Override
     protected void getUnits(int[] units) {//支持的单位列表
         L.e(TAG, "支持的单位列表 = " + Arrays.toString(units));
+        T.showShort(this, "支持的单位列表 = " + Arrays.toString(units));
     }
 
     @Override
@@ -580,7 +550,6 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         if (foodData == null) {//2017-06-16为空直接返回
             return;
         }
-        L.e(TAG, "weight = " + foodData.getData());
         String curWeight = foodData.getData();
         if (TextUtils.equals(curWeight, preWeight)) {
             countWei += 1;
@@ -589,9 +558,9 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
             preWeight = curWeight;
         }
         if (countWei >= 5) {
-            tvShowResult.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            tv_show_result.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
         } else {
-            tvShowResult.setTextColor(getResources().getColor(R.color.black_theme));
+            tv_show_result.setTextColor(getResources().getColor(R.color.black_theme));
         }
         if (foodData.getUnit() != preUnit) {
             preUnit = foodData.getUnit();
@@ -600,84 +569,84 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         }
         String unitStr = getUnitStr(preUnit);
 
-        tvShowResult.setText(preWeight+" "+unitStr  + "\nType:" + foodData.getDeviceType()+ "\n" + foodData.getWeight() + "g");
+        tv_show_result.setText(preWeight + " " + unitStr + "\nType:" + foodData.getDeviceType() + "\n" + foodData.getWeight() + "g");
     }
 
 
     private void showUnit(int preUnit) {
         switch (preUnit) {
             case PabulumBleConfig.UNIT_G:
-                rgUnit.check(R.id.rb_g);
+                rg_unit.check(R.id.rb_g);
                 break;
             case PabulumBleConfig.UNIT_ML:
-                rgUnit.check(R.id.rb_ml);
+                rg_unit.check(R.id.rb_ml);
                 break;
             case PabulumBleConfig.UNIT_LB:
-                rgUnit.check(R.id.rb_lb);
+                rg_unit.check(R.id.rb_lb);
                 break;
             case PabulumBleConfig.UNIT_OZ:
-                rgUnit.check(R.id.rb_oz);
+                rg_unit.check(R.id.rb_oz);
                 break;
             case PabulumBleConfig.UNIT_KG:
-                rgUnit.check(R.id.rb_kg);
+                rg_unit.check(R.id.rb_kg);
                 break;
             case PabulumBleConfig.UNIT_FG:
-                rgUnit.check(R.id.rb_fg);
+                rg_unit.check(R.id.rb_fg);
                 break;
             case PabulumBleConfig.UNIT_ML_MILK:
-                rgUnitTwo.check(R.id.rb_ml_milk);
+                rg_unit.check(R.id.rb_ml_milk);
                 break;
             case PabulumBleConfig.UNIT_ML_WATER:
-                rgUnitTwo.check(R.id.rb_ml_water);
+                rg_unit.check(R.id.rb_ml_water);
                 break;
             case PabulumBleConfig.UNIT_FL_OZ_MILK:
-                rgUnitTwo.check(R.id.rb_floz_milk);
+                rg_unit.check(R.id.rb_floz_milk);
                 break;
             case PabulumBleConfig.UNIT_FL_OZ_WATER:
-                rgUnitTwo.check(R.id.rb_floz_water);
+                rg_unit.check(R.id.rb_floz_water);
                 break;
             case PabulumBleConfig.UNIT_LB_LB:
-                rgUnitTwo.check(R.id.rb_lb_lb);
+                rg_unit.check(R.id.rb_lb_lb);
                 break;
         }
     }
 
 
     private String getUnitStr(int preUnit) {
-        String unitStr=getString(R.string.unit_g);
+        String unitStr = getString(R.string.unit_g);
         switch (preUnit) {
             case PabulumBleConfig.UNIT_G:
-                unitStr=getString(R.string.unit_g);
+                unitStr = getString(R.string.unit_g);
                 break;
             case PabulumBleConfig.UNIT_ML:
-                unitStr=getString(R.string.unit_ml);
+                unitStr = getString(R.string.unit_ml);
                 break;
             case PabulumBleConfig.UNIT_LB:
-                unitStr=getString(R.string.unit_lb_oz);
+                unitStr = getString(R.string.unit_lb_oz);
                 break;
             case PabulumBleConfig.UNIT_OZ:
-                unitStr=getString(R.string.unit_oz);
+                unitStr = getString(R.string.unit_oz);
                 break;
             case PabulumBleConfig.UNIT_KG:
-                unitStr=getString(R.string.unit_kg);
+                unitStr = getString(R.string.unit_kg);
                 break;
             case PabulumBleConfig.UNIT_FG:
-                unitStr=getString(R.string.unit_fg);
+                unitStr = getString(R.string.unit_fg);
                 break;
             case PabulumBleConfig.UNIT_ML_MILK:
-                unitStr=getString(R.string.unit_ml_milk);
+                unitStr = getString(R.string.unit_ml_milk);
                 break;
             case PabulumBleConfig.UNIT_ML_WATER:
-                unitStr=getString(R.string.unit_ml_water);
+                unitStr = getString(R.string.unit_ml_water);
                 break;
             case PabulumBleConfig.UNIT_FL_OZ_MILK:
-                unitStr=getString(R.string.unit_oz_milk);
+                unitStr = getString(R.string.unit_oz_milk);
                 break;
             case PabulumBleConfig.UNIT_FL_OZ_WATER:
-                unitStr=getString(R.string.unit_oz_water);
+                unitStr = getString(R.string.unit_oz_water);
                 break;
             case PabulumBleConfig.UNIT_LB_LB:
-                unitStr=getString(R.string.unit_lb);
+                unitStr = getString(R.string.unit_lb);
                 break;
         }
         return unitStr;
@@ -742,7 +711,12 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
      * 初始化请求权限
      */
     private void initPermissions() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE, Manifest.permission.BLUETOOTH_CONNECT}, 1);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
     }
 
     @Override
@@ -757,44 +731,43 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
                 //权限请求失败，但未选中“不再提示”选项
-                new AlertDialog.Builder(this).setTitle(this.getString(R.string.hint)).setMessage(this.getString(R.string.permissions))
-                        .setPositiveButton(this.getString(R.string.query), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //引导用户至设置页手动授权
-                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", getApplicationContext().getPackageName(), null);
-                                intent.setData(uri);
-                                startActivity(intent);
-                            }
-                        }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                new android.app.AlertDialog.Builder(this).setTitle("提示").setMessage("请求使用定位权限搜索蓝牙设备").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //引导用户至设置页手动授权
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getApplicationContext().getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
+                    }
+                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (dialog != null) {
                             dialog.cancel();
                         }
+
                     }
                 }).show();
             } else {
                 //权限请求失败，选中“不再提示”选项
 //                T.showShort(MainActivity.this, "获取权限失败");
-                new AlertDialog.Builder(this).setTitle(this.getString(R.string.hint)).setMessage(this.getString(R.string.permissions))
-                        .setPositiveButton(this.getString(R.string.query), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //引导用户至设置页手动授权
-                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", getApplicationContext().getPackageName(), null);
-                                intent.setData(uri);
-                                startActivity(intent);
-
-                            }
-                        }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                new android.app.AlertDialog.Builder(this).setTitle("提示").setMessage("请求使用定位权限搜索蓝牙设备").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //引导用户至设置页手动授权
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getApplicationContext().getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
+                    }
+                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (dialog != null) {
                             dialog.cancel();
                         }
+
                     }
                 }).show();
             }
@@ -802,5 +775,6 @@ public class MainActivity extends BaseActivity implements SetRssiDialog.OnQueryL
         }
 
     }
+
 
 }
